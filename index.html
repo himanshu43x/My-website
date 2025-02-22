@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tik-Tac-Toe</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #1e1e2e;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+        }
+        .logo span {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .menu button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        .play-friend { background-color: #4CAF50; color: white; }
+        .play-ai { background-color: #FF5722; color: white; }
+        .menu button:hover { opacity: 0.8; }
+        .game-container {
+            display: none;
+            grid-template-columns: repeat(3, 100px);
+            gap: 5px;
+            margin-top: 20px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+        }
+        .scoreboard {
+            display: none;
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgb1SxXWD_Qf1Qz_PRFWP8-gsb_xBqdO_Tl4JMiFuZJN3teBmxN6-fcJSlJXDE45JLwlDtBPol0XOalMmJyvN6GG-hv272lrNckIQarEvv4ZKlHSsX1hpmUZlJa1RaXLIl8fUVvaMsdijSFnj78P4RwsD4SGeYefKsBrKhuMYNmDwyxDVFi6-TCiDuO9yE/s320/1000061104.png" alt="App Icon">
+        <span>Tik-Tac-Toe</span>
+    </div>
+    <div class="menu">
+        <button class="play-friend" onclick="startGame('friend')">Play with Friend</button>
+        <button class="play-ai" onclick="startGame('ai')">Play with AI</button>
+    </div>
+    <div class="scoreboard" id="scoreboard">
+        Player X: <span id="scoreX">0</span> | Player O: <span id="scoreO">0</span>
+    </div>
+    <div class="game-container" id="gameBoard">
+        <div class="cell" onclick="makeMove(this, 0)"></div>
+        <div class="cell" onclick="makeMove(this, 1)"></div>
+        <div class="cell" onclick="makeMove(this, 2)"></div>
+        <div class="cell" onclick="makeMove(this, 3)"></div>
+        <div class="cell" onclick="makeMove(this, 4)"></div>
+        <div class="cell" onclick="makeMove(this, 5)"></div>
+        <div class="cell" onclick="makeMove(this, 6)"></div>
+        <div class="cell" onclick="makeMove(this, 7)"></div>
+        <div class="cell" onclick="makeMove(this, 8)"></div>
+    </div>
+    <script>
+    let currentPlayer = 'X';
+    let gameMode = '';
+    let scores = { X: 0, O: 0 };
+    function startGame(mode) {
+        gameMode = mode;
+        document.querySelector('.menu').style.display = 'none';
+        document.getElementById('gameBoard').style.display = 'grid';
+        document.getElementById('scoreboard').style.display = 'block';
+    }
+    function makeMove(cell, index) {
+        if (!cell.innerText) {
+            cell.innerText = currentPlayer;
+            if (checkWinner()) {
+                alert(`${currentPlayer} wins!`);
+                scores[currentPlayer]++;
+                updateScoreboard();
+                setTimeout(resetBoard, 1000);
+                return;
+            }
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            if (gameMode === 'ai' && currentPlayer === 'O') {
+                setTimeout(makeAIMove, 500);
+            }
+        }
+    }
+    function makeAIMove() {
+        let cells = document.querySelectorAll('.cell');
+        let emptyCells = Array.from(cells).filter(cell => !cell.innerText);
+        if (emptyCells.length > 0) {
+            let bestMove = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            bestMove.innerText = 'O';
+            if (checkWinner()) {
+                alert('O wins!');
+                scores['O']++;
+                updateScoreboard();
+                setTimeout(resetBoard, 1000);
+            }
+            currentPlayer = 'X';
+        }
+    }
+    function checkWinner() {
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+        let cells = document.querySelectorAll('.cell');
+        return winPatterns.some(pattern => {
+            return pattern.every(index => cells[index].innerText === currentPlayer);
+        });
+    }
+    function updateScoreboard() {
+        document.getElementById('scoreX').innerText = scores['X'];
+        document.getElementById('scoreO').innerText = scores['O'];
+    }
+    function resetBoard() {
+        document.querySelectorAll('.cell').forEach(cell => cell.innerText = '');
+        currentPlayer = 'X';
+    }
+    </script>
+</body>
+</html>
